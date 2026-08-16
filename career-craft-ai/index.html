@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CareerCraft AI — Clean, easy-to-use AI Career Assistant & LinkedIn Profile Optimizer. Minimalist design for students and job seekers.">
+  <title>CareerCraft AI — LinkedIn Profile Optimizer & Career Assistant</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- PDF.js for safe client-side PDF text extraction -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite" role="status"></div>
+
+  <!-- Google-Style Minimal Compliance Bar -->
+  <aside class="compliance-banner" aria-label="Architecture Compliance Note">
+    <div class="banner-content">
+      <span class="badge-safe">🛡️ Safe Architecture</span>
+      <span class="banner-text">100% LinkedIn TOS Compliant • No Scraping • Client-Side Privacy • Direct 1-Click Outbound Links</span>
+      <button type="button" class="banner-link-btn" id="btn-open-arch-modal">Learn More</button>
+    </div>
+  </aside>
+
+  <!-- Google Minimal Navigation Header -->
+  <header class="app-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            <rect width="20" height="14" x="2" y="6" rx="2"></rect>
+            <path d="M10 10h4"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">CareerCraft <span class="accent-text">AI</span></div>
+          <div class="brand-subtitle">AI Career Assistant & LinkedIn Optimizer</div>
+        </div>
+      </div>
+
+      <nav class="header-actions" aria-label="Quick Actions">
+        <div class="demo-persona-wrapper">
+          <label for="persona-select" class="sr-only">Load Demo Student Persona</label>
+          <span class="persona-label">⚡ Demo:</span>
+          <select id="persona-select" class="select-input select-sm">
+            <option value="cs-intern" selected>🎓 CS Student (Java/Spring Backend)</option>
+            <option value="frontend-grad">💻 Junior SWE (React/TypeScript)</option>
+            <option value="data-analyst">📊 Data Analyst (Python/SQL/Tableau)</option>
+            <option value="cloud-devops">☁️ Cloud & DevOps (AWS/Docker)</option>
+          </select>
+        </div>
+        <button type="button" id="btn-load-demo" class="btn btn-secondary btn-sm">Load Demo</button>
+        <button type="button" id="btn-reset" class="btn btn-ghost btn-sm" title="Clear all inputs">Clear</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <div class="container">
+      
+      <!-- Clean Minimal Hero -->
+      <section class="hero-section">
+        <div class="hero-badge">Google-Clean Career Toolkit for Students & New Grads</div>
+        <h1 class="hero-title">Optimize your Resume & LinkedIn with <span class="gradient-text">AI Precision</span></h1>
+        <p class="hero-description">
+          Diagnose skill gaps against real industry roles, generate recruiter-ready headlines & summaries, upgrade project bullets to Google XYZ format, and launch 1-click safe LinkedIn job searches.
+        </p>
+      </section>
+
+      <!-- Step 1: Input & Ingestion Card -->
+      <section class="intake-card" id="intake-section">
+        <div class="intake-header">
+          <div class="intake-tabs" role="tablist">
+            <button type="button" role="tab" aria-selected="true" id="tab-btn-resume" class="intake-tab active" data-target="panel-resume">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              Upload Resume (PDF / TXT)
+            </button>
+            <button type="button" role="tab" aria-selected="false" id="tab-btn-linkedin" class="intake-tab" data-target="panel-linkedin">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+              LinkedIn Profile Fields
+            </button>
+          </div>
+          
+          <div class="role-selector-box">
+            <label for="target-role-select" class="field-label">Target Career Role:</label>
+            <select id="target-role-select" class="select-input select-highlight">
+              <option value="java-backend">Java / Spring Boot Backend Engineer</option>
+              <option value="fullstack-web">Full-Stack Web Developer (React / Node.js)</option>
+              <option value="frontend-dev">Frontend Developer (React / Next.js / TypeScript)</option>
+              <option value="data-analyst">Data Analyst / Business Intelligence (SQL, Python)</option>
+              <option value="ai-ml-engineer">AI & Machine Learning Engineer (Python, PyTorch)</option>
+              <option value="cloud-devops">Cloud & DevOps Engineer (AWS, Docker, CI/CD)</option>
+              <option value="mobile-dev">Mobile App Developer (Flutter / Android / iOS)</option>
+              <option value="product-intern">Associate Product Manager / Tech Intern</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Panel 1: Resume Upload -->
+        <div id="panel-resume" class="tab-panel active" role="tabpanel">
+          <div class="dropzone" id="resume-dropzone">
+            <input type="file" id="resume-file-input" accept=".pdf,.txt,.doc,.docx" class="dropzone-file-input">
+            <div class="dropzone-icon">
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            </div>
+            <div class="dropzone-title">Drag & drop your resume file, or <span class="dropzone-browse">browse</span></div>
+            <div class="dropzone-hint">Supports PDF and TXT (Safe client-side extraction)</div>
+            <div id="file-status" class="file-status hidden"></div>
+          </div>
+          
+          <div class="intake-divider"><span>OR PASTE RESUME / EXPERIENCE TEXT</span></div>
+          
+          <div class="form-group">
+            <label for="raw-resume-text" class="field-label">Resume Text & Experience:</label>
+            <textarea id="raw-resume-text" class="textarea-input" rows="4" placeholder="Paste your resume content, technical skills, and project summaries here..."></textarea>
+          </div>
+        </div>
+
+        <!-- Panel 2: LinkedIn Profile Input -->
+        <div id="panel-linkedin" class="tab-panel" role="tabpanel">
+          <div class="grid-2-cols">
+            <div class="form-group">
+              <label for="li-name" class="field-label">Full Name:</label>
+              <input type="text" id="li-name" class="text-input" placeholder="e.g. Alex Kumar" value="Alex Kumar">
+            </div>
+            <div class="form-group">
+              <label for="li-target-location" class="field-label">Preferred Location / Remote:</label>
+              <input type="text" id="li-target-location" class="text-input" placeholder="e.g. San Francisco, CA or Remote" value="United States or Remote">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="li-current-headline" class="field-label">Current Headline:</label>
+            <input type="text" id="li-current-headline" class="text-input" placeholder="e.g. Student at State Tech | Looking for Internships" value="CS Student at State Tech | Looking for Internships | Java, Python">
+          </div>
+
+          <div class="form-group">
+            <label for="li-current-about" class="field-label">Current 'About' Summary:</label>
+            <textarea id="li-current-about" class="textarea-input" rows="3" placeholder="Paste your current LinkedIn summary...">I am a 3rd year Computer Science student passionate about coding and technology. Looking for software engineering internship opportunities for Summer 2026. Skilled in Java, C++, HTML, CSS.</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="li-current-projects" class="field-label">Project / Experience Bullets to Polish:</label>
+            <textarea id="li-current-projects" class="textarea-input" rows="3" placeholder="List 2-3 project points to upgrade to STAR format...">• Built a university student management system in Java and MySQL.
+• Created a simple e-commerce website using HTML, CSS and backend.
+• Worked on a database course project with MySQL.</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="li-current-skills" class="field-label">Current Skills (comma-separated):</label>
+            <input type="text" id="li-current-skills" class="text-input" placeholder="Java, Python, C++, MySQL, Git" value="Java, C++, MySQL, HTML, CSS, Object Oriented Programming, Git">
+          </div>
+        </div>
+
+        <!-- Action Submit Row -->
+        <div class="intake-actions">
+          <button type="button" id="btn-analyze" class="btn btn-primary btn-lg">
+            <span>⚡ Run AI Analysis & Optimize Profile</span>
+          </button>
+          <div class="intake-note">Evaluates profile score, missing skills, headline formulas, STAR metrics & job queries.</div>
+        </div>
+      </section>
+
+      <!-- Step 2 & 3: Results Dashboard -->
+      <section id="results-dashboard" class="results-dashboard">
+        
+        <!-- Score & Status Overview Banner -->
+        <div class="score-overview-card">
+          <div class="score-main-col">
+            <div class="score-gauge-box">
+              <div class="circular-progress" id="score-circle" data-score="78">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                  <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path id="circle-progress-path" class="circle-fill" stroke-dasharray="78, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="gauge-center-text">
+                  <span id="score-number" class="score-value">78</span>
+                  <span class="score-total">/100</span>
+                </div>
+              </div>
+            </div>
+            <div class="score-info-box">
+              <div class="score-badge-status" id="score-status-badge">⚡ Solid Foundation • Needs High-Impact Polish</div>
+              <h2 class="score-title" id="score-title-text">Profile Strength for <span id="score-role-name" class="text-highlight">Java Backend Engineer</span></h2>
+              <p class="score-summary" id="score-summary-text">
+                Your profile demonstrates foundational programming skills in Java, but is missing critical high-yield industry frameworks (Spring Boot, REST APIs) and quantified project metrics required to rank in top recruiter LinkedIn searches.
+              </p>
+            </div>
+          </div>
+
+          <div class="score-breakdown-grid">
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-name">Headline Impact</span>
+                <span class="metric-val" id="metric-headline-val">65/100</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill warning" id="bar-headline" style="width: 65%;"></div></div>
+              <span class="metric-hint">Needs target role keywords</span>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-name">About Hook</span>
+                <span class="metric-val" id="metric-about-val">60/100</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill warning" id="bar-about" style="width: 60%;"></div></div>
+              <span class="metric-hint">Lacks story & tech clarity</span>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-name">Skill Match Index</span>
+                <span class="metric-val" id="metric-skills-val">70/100</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill warning" id="bar-skills" style="width: 70%;"></div></div>
+              <span class="metric-hint" id="metric-skills-hint">3 critical skills missing</span>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-name">STAR Project Impact</span>
+                <span class="metric-val" id="metric-star-val">55/100</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill danger" id="bar-star" style="width: 55%;"></div></div>
+              <span class="metric-hint">Needs quantified metrics (XYZ)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Workspace Tabs -->
+        <div class="workspace-tabs-container">
+          <div class="workspace-tabs" role="tablist">
+            <button type="button" class="ws-tab active" data-tab="tab-optimizer" role="tab" aria-selected="true">
+              <span>✨</span> LinkedIn Optimizer
+            </button>
+            <button type="button" class="ws-tab" data-tab="tab-skillgap" role="tab" aria-selected="false">
+              <span>🎯</span> Skill-Gap & Roadmap
+            </button>
+            <button type="button" class="ws-tab" data-tab="tab-jobs" role="tab" aria-selected="false">
+              <span>💼</span> Jobs & Safe Search
+            </button>
+            <button type="button" class="ws-tab" data-tab="tab-preview" role="tab" aria-selected="false">
+              <span>👁️</span> Live Preview
+            </button>
+          </div>
+
+          <div class="workspace-actions">
+            <button type="button" id="btn-export-pdf" class="btn btn-outline btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Print / Save Plan
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB 1: LinkedIn Profile Optimizer -->
+        <div id="tab-optimizer" class="ws-tab-content active">
+          
+          <!-- Headline Optimizer -->
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div>
+                <h3 class="feature-title">1. High-Converting LinkedIn Headline Optimizer</h3>
+                <p class="feature-desc">Recruiters search by exact title keywords and core stacks. Replace generic "Student at X" with keyword-optimized headlines.</p>
+              </div>
+              <a href="https://www.linkedin.com/in/me/edit/intro/" target="_blank" rel="noopener noreferrer" class="btn-external-link" title="Open LinkedIn Intro Editor">
+                <span>Edit on LinkedIn</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </a>
+            </div>
+
+            <div class="headline-variants-grid" id="headline-variants-container">
+              <!-- Dynamically populated variants -->
+            </div>
+          </div>
+
+          <!-- About Section Storycrafter -->
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div>
+                <h3 class="feature-title">2. AI-Crafted LinkedIn "About" Summary</h3>
+                <p class="feature-desc">A structured 4-pillar narrative: The Hook, Core Technical Arsenal, Proven Project Impact, and Career Availability.</p>
+              </div>
+              <div class="header-action-group">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-about">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  Copy Summary
+                </button>
+                <a href="https://www.linkedin.com/in/me/edit/about/" target="_blank" rel="noopener noreferrer" class="btn-external-link">
+                  <span>Edit on LinkedIn</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                </a>
+              </div>
+            </div>
+
+            <div class="about-editor-box">
+              <div class="about-output" id="about-section-text" contenteditable="true" spellcheck="false">
+                <!-- Dynamically generated About section -->
+              </div>
+              <div class="about-meta-footer">
+                <span class="char-count" id="about-char-count">850 / 2600 characters</span>
+                <span>💡 Click inside the box above to edit directly before copying.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project & STAR Bullet Enhancer -->
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div>
+                <h3 class="feature-title">3. STAR / Google XYZ Project Bullet Transformer</h3>
+                <p class="feature-desc">Transform weak statements into the Google formula: <em>"Accomplished [X], as measured by [Y], by doing [Z]"</em>.</p>
+              </div>
+            </div>
+
+            <div class="star-bullets-list" id="star-bullets-container">
+              <!-- Dynamically populated bullet transformations -->
+            </div>
+
+            <div class="custom-bullet-tool">
+              <h4 class="subheading">⚡ Quick Bullet Rewriter Tool</h4>
+              <div class="bullet-tool-row">
+                <input type="text" id="input-custom-bullet" class="text-input" placeholder="Type or paste any project line (e.g. 'Created a website with React and Node')">
+                <button type="button" id="btn-transform-custom-bullet" class="btn btn-primary btn-sm">Rewrite</button>
+              </div>
+              <div id="custom-bullet-result" class="custom-bullet-result hidden"></div>
+            </div>
+          </div>
+
+          <!-- Top Skills to Add to LinkedIn -->
+          <div class="feature-card">
+            <div class="feature-card-header">
+              <div>
+                <h3 class="feature-title">4. Top Recommended Skills to Add on LinkedIn</h3>
+                <p class="feature-desc">Adding these specific tags boosts your profile rank in LinkedIn Recruiter search filters.</p>
+              </div>
+              <a href="https://www.linkedin.com/in/me/edit/skills/" target="_blank" rel="noopener noreferrer" class="btn-external-link">
+                <span>Add Skills on LinkedIn</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </a>
+            </div>
+
+            <div class="skills-to-add-grid" id="skills-to-add-container">
+              <!-- Dynamically populated skills tags with copy buttons -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB 2: Skill-Gap Analysis & 2-Week Roadmap -->
+        <div id="tab-skillgap" class="ws-tab-content">
+          <div class="grid-2-cols-unequal">
+            
+            <!-- Skill Extraction & Gap Breakdown -->
+            <div class="feature-card">
+              <h3 class="feature-title">Extracted Skills vs Industry Demand</h3>
+              <p class="feature-desc">Comparison against top 5,000+ job postings for <span class="text-highlight" id="skillgap-role-label">Java Backend Engineer</span>.</p>
+
+              <div class="skill-category-block">
+                <div class="skill-category-title matched">
+                  <span>✅</span> Identified in Your Profile (<span id="matched-skills-count">6</span>)
+                </div>
+                <div class="skill-chips-wrap" id="matched-skills-container">
+                  <!-- Matched skills chips -->
+                </div>
+              </div>
+
+              <div class="skill-category-block">
+                <div class="skill-category-title missing">
+                  <span>⚠️</span> Critical Missing Skills (High Recruiter Weight)
+                </div>
+                <div class="missing-skills-list" id="missing-skills-container">
+                  <!-- Missing skills detailed cards -->
+                </div>
+              </div>
+
+              <div class="skill-category-block">
+                <div class="skill-category-title bonus">
+                  <span>✨</span> Recommended Bonus Skills
+                </div>
+                <div class="skill-chips-wrap" id="bonus-skills-container">
+                  <!-- Bonus skills chips -->
+                </div>
+              </div>
+            </div>
+
+            <!-- 2-Week Learning Sprint Roadmap -->
+            <div class="feature-card">
+              <div class="feature-card-header">
+                <div>
+                  <h3 class="feature-title">🚀 2-Week Skill-Gap Bridge Roadmap</h3>
+                  <p class="feature-desc">Actionable daily sprint to master your missing skills and build resume-grade portfolio projects.</p>
+                </div>
+              </div>
+
+              <div class="roadmap-timeline" id="roadmap-timeline-container">
+                <!-- Roadmap sprint items -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 3: Recommended Jobs & Safe Search Links -->
+        <div id="tab-jobs" class="ws-tab-content">
+          <div class="jobs-intro-banner">
+            <div class="jobs-intro-icon">🎯</div>
+            <div>
+              <h3 class="jobs-intro-title">Safe Outbound Job Search Launcher</h3>
+              <p class="jobs-intro-text">
+                Rather than risky unauthorized automated scraping, we generate <strong>curated high-intent Boolean search queries</strong> and deep links. Click any role to instantly open LinkedIn with optimal experience filters (`Internship`, `Entry-level`) and recent posting recency.
+              </p>
+            </div>
+          </div>
+
+          <div class="job-cards-grid" id="job-recommendations-container">
+            <!-- Dynamically populated job cards with direct LinkedIn, Google & Indeed search deep-links -->
+          </div>
+        </div>
+
+        <!-- TAB 4: Live LinkedIn Mockup Preview -->
+        <div id="tab-preview" class="ws-tab-content">
+          <div class="preview-controls">
+            <span class="preview-controls-label">Toggle Comparison:</span>
+            <div class="btn-group">
+              <button type="button" id="btn-preview-before" class="btn btn-outline btn-sm">Original / Before</button>
+              <button type="button" id="btn-preview-after" class="btn btn-primary btn-sm active">AI Optimized / After</button>
+            </div>
+          </div>
+
+          <div class="linkedin-mock-card">
+            <div class="li-mock-banner"></div>
+            
+            <div class="li-mock-profile-header">
+              <div class="li-mock-avatar-wrap">
+                <div class="li-mock-avatar" id="mock-avatar">AK</div>
+                <div class="li-mock-badge" title="Open to Work Badge">#OPEN TO WORK</div>
+              </div>
+              <div class="li-mock-header-info">
+                <div class="li-mock-name-row">
+                  <h2 class="li-mock-name" id="mock-name">Alex Kumar</h2>
+                  <span class="li-mock-pronouns">(He/Him)</span>
+                  <span class="li-mock-degree">• 1st</span>
+                </div>
+                <div class="li-mock-headline" id="mock-headline">
+                  Aspiring Java Backend Engineer | Building Scalable Spring Boot & REST APIs | CS Junior
+                </div>
+                <div class="li-mock-meta">
+                  <span id="mock-location">San Francisco Bay Area</span> • 
+                  <span class="li-link">Contact info</span> • 
+                  <span class="li-connections">500+ connections</span>
+                </div>
+                <div class="li-mock-actions">
+                  <button class="li-btn-primary">Open to</button>
+                  <button class="li-btn-secondary">Add profile section</button>
+                  <button class="li-btn-ghost">More</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mock Open to Work Card -->
+            <div class="li-opentowork-box">
+              <div class="otw-title">Open to work</div>
+              <div class="otw-roles" id="mock-otw-roles">Software Engineer, Backend Developer, and Java Developer roles</div>
+              <div class="otw-locations">Hybrid, On-site, or Remote</div>
+            </div>
+
+            <!-- Mock About Section -->
+            <div class="li-mock-section">
+              <h3 class="li-mock-section-title">About</h3>
+              <div class="li-mock-about-body" id="mock-about-body">
+                <!-- Mock About Text -->
+              </div>
+            </div>
+
+            <!-- Mock Skills Section -->
+            <div class="li-mock-section">
+              <h3 class="li-mock-section-title">Featured Skills</h3>
+              <div class="li-mock-skills-chips" id="mock-skills-chips">
+                <!-- Mock Skill Chips -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Architecture / Compliance Modal -->
+  <div id="arch-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="arch-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-title" id="arch-modal-title">
+          🛡️ Project Architecture & LinkedIn Best Practices
+        </div>
+        <button type="button" class="modal-close-btn" id="btn-close-arch-modal" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="arch-flow-diagram">
+          <div class="arch-box">
+            <span class="arch-box-title">User Inbound</span>
+            <span class="arch-box-desc">Upload Resume / Paste Profile</span>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-box highlight">
+            <span class="arch-box-title">CareerCraft AI</span>
+            <span class="arch-box-desc">Skill Extraction • Gap Analysis • STAR Optimization</span>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-box">
+            <span class="arch-box-title">Safe Outbound</span>
+            <span class="arch-box-desc">1-Click Copy + Direct LinkedIn Links</span>
+          </div>
+        </div>
+
+        <h4 class="modal-subheading">Why This is the Superior Design for Student Projects:</h4>
+        <ul class="modal-bullet-list">
+          <li><strong>No Scraping Violations:</strong> Automated scraping of LinkedIn violates Section 8.2 of LinkedIn User Agreement and triggers CAPTCHAs/IP blocks.</li>
+          <li><strong>Zero Account Risk:</strong> Requiring user LinkedIn login passwords is an unsafe antipattern. This application never asks for credentials.</li>
+          <li><strong>Deep-Link Empowerment:</strong> Users receive fully formatted headlines, summaries, and exact job search queries, with 1-click links directly into LinkedIn's editing interfaces.</li>
+          <li><strong>Privacy First:</strong> All PDF parsing and text intelligence processes client-side without storing private resumes on external servers.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn-modal-got-it">Got it, thanks!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print / Export Modal -->
+  <div id="print-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          📄 Career Action Plan & Optimization Summary
+        </div>
+        <button type="button" class="modal-close-btn" id="btn-close-print-modal">&times;</button>
+      </div>
+      <div class="modal-body print-content" id="print-report-content">
+        <!-- Rendered Print Report -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="btn-print-trigger">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          Print / Save PDF
+        </button>
+        <button type="button" class="btn btn-secondary" id="btn-copy-report">Copy as Markdown</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="container footer-inner">
+      <div class="footer-left">
+        <strong>CareerCraft AI</strong> — Clean AI career assistant & LinkedIn profile optimizer.
+      </div>
+      <div class="footer-right">
+        <span>Designed for college projects, job seekers & tech interns.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
